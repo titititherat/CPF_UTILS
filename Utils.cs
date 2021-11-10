@@ -3,45 +3,129 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Jint;
+using System.IO;
 using System.Threading;
+using Figgle;
+using Console = Colorful.Console;
+using System.Drawing;
 
-namespace Gerador_CPF
+namespace CPF_UTILS
 {
-	class Utils
-	{
-		public static String GerarCPF()
-		{
-			int soma = 0, resto = 0;
-			int[] multiplicador1 = new int[9] { 10, 9, 8, 7, 6, 5, 4, 3, 2 };
-			int[] multiplicador2 = new int[10] { 11, 10, 9, 8, 7, 6, 5, 4, 3, 2 };
+    class Utils
+    {
+        public static void GerarCPF(int quantia)
+        {
+            var cpfFunction = File.ReadAllText("cpf.js");
+            var javascript = new Engine();
+            javascript.Execute(cpfFunction);
 
-			Random rnd = new Random();
-			string semente = rnd.Next(100000000, 999999999).ToString();
+            int i = 1;
 
-			for (int i = 0; i < 9; i++)
-				soma += int.Parse(semente[i].ToString()) * multiplicador1[i];
+            while (i <= quantia){
+                string cpf = javascript.Invoke("gerarCPF").ToString();
+                
+                try
+                {
+                    StreamWriter salvarcpf = File.AppendText("CPF.txt");
+                    salvarcpf.WriteLine(cpf);
+                    Console.Write("[", Color.Lavender);
+                    Console.Write(i, Color.Red);
+                    Console.Write("]", Color.Lavender);
+                    Console.WriteLine(cpf);
+                    salvarcpf.Close();
+                    i = i + 1;
+                }
+                catch(Exception e)
+                {
+                    Thread.Sleep(10);
+                }
+                
+                
+                
+            }
+            Console.WriteLine("Aperte ENTER para retornar ao menu");
+            Console.ReadLine();
+            Console.Clear();
+        }
 
-			resto = soma % 11;
-			if (resto < 2)
-				resto = 0;
-			else
-				resto = 11 - resto;
+        public static void GerarCPFSENHA6(int quantia)
+        {
+            var cpfFunction = File.ReadAllText("cpf.js");
+            var javascript = new Engine();
+            javascript.Execute(cpfFunction);
 
-			semente = semente + resto;
-			soma = 0;
+            int i = 1;
 
-			for (int i = 0; i < 10; i++)
-				soma += int.Parse(semente[i].ToString()) * multiplicador2[i];
+            while (i <= quantia)
+            {
+                string cpf = javascript.Invoke("gerarCPF").ToString();
+                
 
-			resto = soma % 11;
+                try
+                {
+                    StreamWriter salvarcpf = File.AppendText("CPF_SENHA6.txt");
+                    string senha = cpf.Substring(0, 6);
+                    string cpfsenha6 = cpf += ":" + senha;
+                    salvarcpf.WriteLine(cpfsenha6);
+                    Console.Write("[", Color.Lavender);
+                    Console.Write(i, Color.Red);
+                    Console.Write("]", Color.Lavender);
+                    Console.WriteLine(cpfsenha6);
+                    salvarcpf.Close();
+                    i = i + 1;
+                }
+                catch (Exception e)
+                {
+                    Thread.Sleep(10);
+                }
 
-			if (resto < 2)
-				resto = 0;
-			else
-				resto = 11 - resto;
 
-			semente = semente + resto;
-			return semente;
-		}
-	}
+               
+            }
+            Console.WriteLine("Aperte ENTER para retornar ao menu");
+            Console.ReadLine();
+            Console.Clear();
+        }
+
+        public static void GerarCPFSENHA8(int quantia)
+        {
+            var cpfFunction = File.ReadAllText("cpf.js");
+            var javascript = new Engine();
+            javascript.Execute(cpfFunction);
+
+            int i = 1;
+
+            while (i <= quantia)
+            {
+                string cpf = javascript.Invoke("gerarCPF").ToString();
+
+
+                try
+                {
+                    StreamWriter salvarcpf = File.AppendText("CPF_SENHA8.txt");
+                    string senha = cpf.Substring(0, 8);
+                    string cpfsenha8 = cpf += ":" + senha;
+                    salvarcpf.WriteLine(cpfsenha8);
+                    Console.Write("[", Color.Lavender);
+                    Console.Write(i, Color.Red);
+                    Console.Write("]", Color.Lavender);
+                    Console.WriteLine(cpfsenha8);
+                    salvarcpf.Close();
+                    i = i + 1;
+                }
+                catch (Exception e)
+                {
+                    Thread.Sleep(10);
+                }
+
+
+
+            }
+            Console.WriteLine("Aperte ENTER para retornar ao menu");
+            Console.ReadLine();
+            Console.Clear();
+        }
+
+    }
 }
